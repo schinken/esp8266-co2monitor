@@ -9,6 +9,6 @@ const char* MQTT_TOPIC_CO2_MEASUREMENT = "sensor/co2/hackcenter";
 const char* MQTT_TOPIC_SENSOR_STATE = "state/sensor/co2/hackcenter";
 
 
-const char* WIFI_HOSTNAME = "ESP-Lasertracker";
+const char* WIFI_HOSTNAME = "ESP-co2Monitor";
 const char* WIFI_SSID = "tolles wifi";
 const char* WIFI_PASSWORD = "tolles pw";
