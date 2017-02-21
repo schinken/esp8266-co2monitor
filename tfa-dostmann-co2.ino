@@ -1,6 +1,11 @@
+#include <PubSubClient.h>
+#include <ESP8266WiFi.h>
+#include <SimpleTimer.h>
+#include "settings.h"
 
-#define PIN_CLK D4
-#define PIN_DATA D3
+SimpleTimer timer;
+WiFiClient wifiClient;
+PubSubClient mqttClient;
 
 uint8_t bitIndex = 0;
 uint8_t byteIndex = 0;
@@ -15,6 +20,7 @@ uint16_t co2Measurement = 0;
 
 byte bits[8];
 byte readBytes[5] = {0};
+char sprintfHelper[16] = {0};
 
 void setup() {
   Serial.begin(115200);
@@ -23,6 +29,27 @@ void setup() {
   pinMode(PIN_DATA, INPUT);
 
   attachInterrupt(PIN_CLK, onClock, RISING);
+
+  WiFi.hostname(WIFI_HOSTNAME);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(500);
+  }
+
+  mqttClient.setClient(wifiClient);
+  mqttClient.setServer(MQTT_HOST, 1883);
+
+  mqttConnect();
+
+  timer.setInterval(PUBLISH_INTERVAL_MS, []() {
+    if (co2Measurement > 0) {
+      sprintf(sprintfHelper, "%d", co2Measurement);
+      mqttClient.publish(MQTT_TOPIC_CO2_MEASUREMENT, sprintfHelper, true);
+    }
+  });
 }
 
 void onClock() {
@@ -47,6 +74,14 @@ void onClock() {
   }
 }
 
+void mqttConnect() {
+  while (!mqttClient.connected()) {
+    mqttClient.connect(WIFI_HOSTNAME, MQTT_TOPIC_SENSOR_STATE, 1, true, "disconnected");
+    mqttClient.publish(MQTT_TOPIC_SENSOR_STATE, "connected", true);
+
+    delay(1000);
+  }
+}
 
 void loop() {
   currentMillis = millis();
@@ -56,6 +91,11 @@ void loop() {
     bitIndex = 0;
     byteIndex = 0;
   }
+
+  mqttConnect();
+  mqttClient.loop();
+
+  timer.run();
 }
 
 bool decodeDataPackage(byte data[5]) {
@@ -72,8 +112,6 @@ bool decodeDataPackage(byte data[5]) {
   switch (data[0]) {
     case 0x50:
       co2Measurement = (data[1] << 8) | data[2];
-      Serial.print("CO2: ");
-      Serial.println(co2Measurement);
       break;
   }
 

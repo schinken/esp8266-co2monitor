@@ -1,0 +1,14 @@
+#define PIN_CLK D4
+#define PIN_DATA D3
+
+#define PUBLISH_INTERVAL_MS (5 * 60 * 1000)
+
+const char* MQTT_HOST = "mqtt.core.bckspc.de";
+
+const char* MQTT_TOPIC_CO2_MEASUREMENT = "sensor/co2/hackcenter";
+const char* MQTT_TOPIC_SENSOR_STATE = "state/sensor/co2/hackcenter";
+
+
+const char* WIFI_HOSTNAME = "ESP-Lasertracker";
+const char* WIFI_SSID = "tolles wifi";
+const char* WIFI_PASSWORD = "tolles pw";
