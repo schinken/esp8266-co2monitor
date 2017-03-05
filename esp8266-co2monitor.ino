@@ -1,5 +1,6 @@
 #include <PubSubClient.h>
 #include <ESP8266WiFi.h>
+#include <ArduinoOTA.h>
 #include <SimpleTimer.h>
 #include "settings.h"
 
@@ -41,6 +42,10 @@ void setup() {
 
   mqttClient.setClient(wifiClient);
   mqttClient.setServer(MQTT_HOST, 1883);
+  
+  ArduinoOTA.setHostname(HOSTNAME);
+  ArduinoOTA.setPassword(OTA_PASSWORD);
+  ArduinoOTA.begin();
 
   mqttConnect();
 
@@ -96,6 +101,7 @@ void loop() {
   mqttClient.loop();
 
   timer.run();
+  ArduinoOTA.handle();
 }
 
 bool decodeDataPackage(byte data[5]) {
