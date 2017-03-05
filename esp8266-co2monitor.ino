@@ -4,6 +4,14 @@
 #include <SimpleTimer.h>
 #include "settings.h"
 
+#define IDX_CMD 0
+#define IDX_MSB 1
+#define IDX_LSB 2
+#define IDX_CHECKSUM 3
+#define IDX_END 4
+
+#define CMD_CO2_MEASUREMENT 0x50
+
 SimpleTimer timer;
 WiFiClient wifiClient;
 PubSubClient mqttClient;
@@ -20,7 +28,8 @@ unsigned long lastMillis = 0;
 uint16_t co2Measurement = 0;
 
 byte bits[8];
-byte readBytes[5] = {0};
+byte bytes[5] = {0};
+
 char sprintfHelper[16] = {0};
 
 void setup() {
@@ -69,13 +78,13 @@ void onClock() {
       tmp |= (bits[i] << (7 - i));
     }
 
-    readBytes[byteIndex++] = tmp;
+    bytes[byteIndex++] = tmp;
     bitIndex = 0;
   }
 
   if (byteIndex >= 5) {
     byteIndex = 0;
-    decodeDataPackage(readBytes);
+    decodeDataPackage(bytes);
   }
 }
 
@@ -106,18 +115,18 @@ void loop() {
 
 bool decodeDataPackage(byte data[5]) {
 
-  if (data[4] != 0x0D) {
+  if (data[IDX_END] != 0x0D) {
     return false;
   }
 
-  uint8_t checksum = data[0] + data[1] + data[2];
+  uint8_t checksum = data[IDX_CMD] + data[IDX_MSB] + data[IDX_MSB];
   if (data[3] != checksum) {
     return false;
   }
 
-  switch (data[0]) {
-    case 0x50:
-      co2Measurement = (data[1] << 8) | data[2];
+  switch (data[IDX_CMD]) {
+    case CMD_CO2_MEASUREMENT:
+      co2Measurement = (data[IDX_MSB] << 8) | data[IDX_MSB];
       break;
   }
 
