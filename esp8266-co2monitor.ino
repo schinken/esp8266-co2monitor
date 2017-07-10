@@ -90,10 +90,11 @@ void onClock() {
 
 void mqttConnect() {
   while (!mqttClient.connected()) {
-    mqttClient.connect(WIFI_HOSTNAME, MQTT_TOPIC_SENSOR_STATE, 1, true, "disconnected");
-    mqttClient.publish(MQTT_TOPIC_SENSOR_STATE, "connected", true);
-
-    delay(1000);
+    if (mqttClient.connect(WIFI_HOSTNAME, MQTT_TOPIC_SENSOR_STATE, 1, true, "disconnected")) {
+      mqttClient.publish(MQTT_TOPIC_SENSOR_STATE, "connected", true);
+    } else {
+      delay(1000);
+    }
   }
 }
 
