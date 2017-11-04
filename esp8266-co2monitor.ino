@@ -135,7 +135,7 @@ bool decodeDataPackage(byte data[5]) {
 
   switch (data[IDX_CMD]) {
     case CMD_CO2_MEASUREMENT:
-      co2Measurement = (data[IDX_MSB] << 8) | data[IDX_MSB];
+      co2Measurement = (data[IDX_MSB] << 8) | data[IDX_LSB];
       Serial.print("CO2: ");
       Serial.println(co2Measurement);
       break;
