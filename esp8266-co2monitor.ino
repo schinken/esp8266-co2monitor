@@ -45,7 +45,7 @@ void setup() {
   WiFi.hostname(WIFI_HOSTNAME);
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  
+
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     delay(500);
@@ -53,7 +53,7 @@ void setup() {
 
   mqttClient.setClient(wifiClient);
   mqttClient.setServer(MQTT_HOST, 1883);
-  
+
   ArduinoOTA.setHostname(WIFI_HOSTNAME);
   ArduinoOTA.setPassword(OTA_PASSWORD);
   ArduinoOTA.begin();
@@ -69,7 +69,7 @@ void setup() {
 }
 
 void onClock() {
-  
+
   lastMillis = millis();
   bits[bitIndex++] = (digitalRead(PIN_DATA) == HIGH) ? 1 : 0;
 
@@ -132,7 +132,7 @@ bool decodeDataPackage(byte data[5]) {
       co2Measurement = (data[IDX_MSB] << 8) | data[IDX_MSB];
       break;
     case CMD_TEMPERATURE:
-      temperature = ((data[IDX_MSB] << 8) | data[IDX_LSB])/16.0-273.15;
+      temperature = ((data[IDX_MSB] << 8) | data[IDX_LSB]) / 16.0 - 273.15;
       break;
   }
 
