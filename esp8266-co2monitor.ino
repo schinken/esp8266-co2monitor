@@ -10,6 +10,7 @@
 #define IDX_CHECKSUM 3
 #define IDX_END 4
 
+#define CMD_TEMPERATURE 0x42
 #define CMD_CO2_MEASUREMENT 0x50
 
 SimpleTimer timer;
@@ -26,6 +27,7 @@ unsigned long currentMillis = 0;
 unsigned long lastMillis = 0;
 
 uint16_t co2Measurement = 0;
+uint16_t temperature = 0;
 
 byte bits[8];
 byte bytes[5] = {0};
@@ -128,6 +130,9 @@ bool decodeDataPackage(byte data[5]) {
   switch (data[IDX_CMD]) {
     case CMD_CO2_MEASUREMENT:
       co2Measurement = (data[IDX_MSB] << 8) | data[IDX_MSB];
+      break;
+    case CMD_TEMPERATURE:
+      temperature = ((data[IDX_MSB] << 8) | data[IDX_LSB])/16.0-273.15;
       break;
   }
 
