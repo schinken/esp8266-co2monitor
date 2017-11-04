@@ -13,7 +13,7 @@ Interface an TFA Dostmann CO2 Monitor with ESP8266 (in our example a WEMOS D1 Mi
 
 ## wiring
 
-Add a pin header to the existing PCB. Left to right: GND, Block, Data, 5V:
+Add a pin header to the existing PCB. Left to right: GND, Clock, Data, 5V:
 <br>
 <a href="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/pinheader.jpg?raw=true">
     <img alt="PIN Header" src="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/pinheader-thumb.jpg?raw=true">
