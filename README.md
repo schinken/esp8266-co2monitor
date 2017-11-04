@@ -15,15 +15,21 @@ Interface an TFA Dostmann CO2 Monitor with ESP8266 (in our example a WEMOS D1 Mi
 
 Add a pin header to the existing PCB. Left to right: GND, Block, Data, 5V:
 <br>
-<img alt="PIN Header" src="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/pinheader.jpg?raw=true" height="250">
+<a href="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/pinheader.jpg?raw=true">
+    <img alt="PIN Header" src="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/pinheader-thumb.jpg?raw=true">
+</a>
 
 Wire up your WEMOS with 4 wires, connected to 5V, G, D4 and D3:
 <br>
-<img alt="Wemos Wiring" src="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/wemos-wiring.jpg?raw=true" height="250">
+<a href="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/wemos-wiring.jpg?raw=true">
+    <img alt="Wemos Wiring" src="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/wemos-wiring-thumb.jpg?raw=true">
+</a>
 
 Now connect your Wemos D1 mini to your co2 monitor:
 <br>
-<img alt="Result" src="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/wiring.jpg?raw=true" height="250">
+<a href="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/wiring.jpg?raw=true">
+    <img alt="Final Wiring" src="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/wiring-thumb.jpg?raw=true">
+</a>
 
 ## dependencies
 
