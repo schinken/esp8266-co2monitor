@@ -65,6 +65,11 @@ void setup() {
       sprintf(sprintfHelper, "%d", co2Measurement);
       mqttClient.publish(MQTT_TOPIC_CO2_MEASUREMENT, sprintfHelper, true);
     }
+
+    if (temperature > 0) {
+      sprintf(sprintfHelper, "%.2f", temperature);
+      mqttClient.publish(MQTT_TOPIC_TEMPERATURE_MEASUREMENT, sprintfHelper, true);
+    }
   });
 }
 

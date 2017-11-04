@@ -6,6 +6,7 @@
 const char* MQTT_HOST = "mqtt.core.bckspc.de";
 
 const char* MQTT_TOPIC_CO2_MEASUREMENT = "sensor/co2/hackcenter";
+const char* MQTT_TOPIC_TEMPERATURE_MEASUREMENT = "sensor/temperature/hackcenter/co2sensor";
 const char* MQTT_TOPIC_SENSOR_STATE = "state/sensor/co2/hackcenter";
 
 const char* WIFI_HOSTNAME = "ESP-co2Monitor";
