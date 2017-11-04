@@ -9,7 +9,7 @@ Interface an TFA Dostmann CO2 Monitor with ESP8266 (in our example a WEMOS D1 Mi
 * Rename settings.h.example to settings.h
 * Open up your arduino IDE
 * Configure your OTA, Wifi, MQTT Topics in the settings.h file
-* Upload the compiled result to your Wemos W1 Mini
+* Upload the compiled result to your Wemos D1 Mini
 
 ## wiring
 
@@ -19,7 +19,7 @@ Add a pin header to the existing PCB. Left to right: GND, Block, Data, 5V:
     <img alt="PIN Header" src="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/pinheader-thumb.jpg?raw=true">
 </a>
 
-Wire up your WEMOS with 4 wires, connected to 5V, G, D4 and D3:
+Wire up your Wemos with 4 wires, connected to 5V, G, D4 and D3:
 <br>
 <a href="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/wemos-wiring.jpg?raw=true">
     <img alt="Wemos Wiring" src="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/wemos-wiring-thumb.jpg?raw=true">
