@@ -27,7 +27,7 @@ unsigned long currentMillis = 0;
 unsigned long lastMillis = 0;
 
 uint16_t co2Measurement = 0;
-uint16_t temperature = 0;
+float temperature = 0;
 
 byte bits[8];
 byte bytes[5] = {0};
@@ -36,6 +36,7 @@ char sprintfHelper[16] = {0};
 
 void setup() {
   Serial.begin(115200);
+  Serial.println("Hello");
 
   pinMode(PIN_CLK, INPUT);
   pinMode(PIN_DATA, INPUT);
@@ -127,7 +128,7 @@ bool decodeDataPackage(byte data[5]) {
     return false;
   }
 
-  uint8_t checksum = data[IDX_CMD] + data[IDX_MSB] + data[IDX_MSB];
+  uint8_t checksum = data[IDX_CMD] + data[IDX_MSB] + data[IDX_LSB];
   if (data[3] != checksum) {
     return false;
   }
@@ -135,9 +136,13 @@ bool decodeDataPackage(byte data[5]) {
   switch (data[IDX_CMD]) {
     case CMD_CO2_MEASUREMENT:
       co2Measurement = (data[IDX_MSB] << 8) | data[IDX_MSB];
+      Serial.print("CO2: ");
+      Serial.println(co2Measurement);
       break;
     case CMD_TEMPERATURE:
       temperature = ((data[IDX_MSB] << 8) | data[IDX_LSB]) / 16.0 - 273.15;
+      Serial.print("Temp: ");
+      Serial.println(temperature);
       break;
   }
 
