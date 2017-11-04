@@ -129,7 +129,7 @@ bool decodeDataPackage(byte data[5]) {
   }
 
   uint8_t checksum = data[IDX_CMD] + data[IDX_MSB] + data[IDX_LSB];
-  if (data[3] != checksum) {
+  if (data[IDX_CHECKSUM] != checksum) {
     return false;
   }
 
