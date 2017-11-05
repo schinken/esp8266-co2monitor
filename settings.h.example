@@ -1,7 +1,10 @@
 #define PIN_CLK D4
 #define PIN_DATA D3
 
-#define PUBLISH_INTERVAL_MS (5 * 60 * 1000)
+const float EXP_SMOOTH_ALPHA = 0.1;
+
+const unsigned long PUBLISH_INTERVAL_FAST_MS = (10 * 1000);
+const unsigned long PUBLISH_INTERVAL_SLOW_MS = (5 * 60 * 1000);
 
 const char* MQTT_HOST = "mqtt.core.bckspc.de";
 

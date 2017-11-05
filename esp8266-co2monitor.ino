@@ -1,7 +1,6 @@
 #include <PubSubClient.h>
 #include <ESP8266WiFi.h>
 #include <ArduinoOTA.h>
-#include <SimpleTimer.h>
 #include "settings.h"
 
 #define IDX_CMD 0
@@ -13,7 +12,6 @@
 #define CMD_TEMPERATURE 0x42
 #define CMD_CO2_MEASUREMENT 0x50
 
-SimpleTimer timer;
 WiFiClient wifiClient;
 PubSubClient mqttClient;
 
@@ -25,8 +23,11 @@ uint8_t lastClkValue = LOW;
 uint8_t tmp = 0;
 unsigned long currentMillis = 0;
 unsigned long lastMillis = 0;
+unsigned long lastUpdateMs = 0;
 
 uint16_t co2Measurement = 0;
+float smoothCo2Measurement = 0.0;
+
 float temperature = 0;
 
 byte bits[8];
@@ -60,18 +61,6 @@ void setup() {
   ArduinoOTA.begin();
 
   mqttConnect();
-
-  timer.setInterval(PUBLISH_INTERVAL_MS, []() {
-    if (co2Measurement > 0) {
-      sprintf(sprintfHelper, "%d", co2Measurement);
-      mqttClient.publish(MQTT_TOPIC_CO2_MEASUREMENT, sprintfHelper, true);
-    }
-
-    if (temperature > 0) {
-      sprintf(sprintfHelper, "%.2f", temperature);
-      mqttClient.publish(MQTT_TOPIC_TEMPERATURE_MEASUREMENT, sprintfHelper, true);
-    }
-  });
 }
 
 void onClock() {
@@ -115,10 +104,32 @@ void loop() {
     byteIndex = 0;
   }
 
+  long updateInterval = PUBLISH_INTERVAL_SLOW_MS;
+
+  // If the change is above a specific threshold, we update faster!
+  float percentChange = abs((float) co2Measurement / smoothCo2Measurement);
+  if (percentChange > 1.10) {
+    updateInterval = PUBLISH_INTERVAL_FAST_MS;
+  }
+
+  if (currentMillis - lastUpdateMs > updateInterval) {
+    lastUpdateMs = millis();
+
+    if (co2Measurement > 0) {
+      sprintf(sprintfHelper, "%d", co2Measurement);
+      mqttClient.publish(MQTT_TOPIC_CO2_MEASUREMENT, sprintfHelper, true);
+    }
+
+    if (temperature > 0) {
+      sprintf(sprintfHelper, "%.2f", temperature);
+      mqttClient.publish(MQTT_TOPIC_TEMPERATURE_MEASUREMENT, sprintfHelper, true);
+    }
+
+  }
+
   mqttConnect();
   mqttClient.loop();
 
-  timer.run();
   ArduinoOTA.handle();
 }
 
@@ -136,6 +147,10 @@ bool decodeDataPackage(byte data[5]) {
   switch (data[IDX_CMD]) {
     case CMD_CO2_MEASUREMENT:
       co2Measurement = (data[IDX_MSB] << 8) | data[IDX_LSB];
+
+      // Exponential smoothing
+      smoothCo2Measurement = EXP_SMOOTH_ALPHA * (float) co2Measurement + (1.0 - EXP_SMOOTH_ALPHA) * smoothCo2Measurement;
+
       Serial.print("CO2: ");
       Serial.println(co2Measurement);
       break;
