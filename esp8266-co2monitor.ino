@@ -108,7 +108,7 @@ void loop() {
 
   // If the change is above a specific threshold, we update faster!
   float percentChange = abs(((float) co2Measurement / smoothCo2Measurement) - 1.0);   
-  if (percentChange > 0.10) {
+  if (percentChange > 0.05) {
     updateInterval = PUBLISH_INTERVAL_FAST_MS;
   }
 
