@@ -36,6 +36,10 @@ byte bytes[5] = {0};
 char sprintfHelper[16] = {0};
 
 void setup() {
+
+  // Power up wait
+  delay(2000);
+  
   Serial.begin(115200);
   Serial.println("Hello");
 
