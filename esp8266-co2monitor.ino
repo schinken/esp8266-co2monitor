@@ -121,7 +121,7 @@ void loop() {
     }
 
     if (temperature > 0) {
-      sprintf(sprintfHelper, "%.2f", temperature);
+      dtostrf(temperature, 4, 2, sprintfHelper);
       mqttClient.publish(MQTT_TOPIC_TEMPERATURE_MEASUREMENT, sprintfHelper, true);
     }
 
