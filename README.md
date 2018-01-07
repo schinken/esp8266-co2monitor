@@ -19,7 +19,7 @@ Add a pin header to the existing PCB. Left to right: GND, Clock, Data, 5V:
     <img alt="PIN Header" src="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/pinheader-thumb.jpg?raw=true">
 </a>
 
-Wire up your Wemos with 4 wires, connected to 5V, G, D4 and D3:
+Wire up your Wemos with 4 wires, connected to 5V, G, D2 and D1:
 <br>
 <a href="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/wemos-wiring.jpg?raw=true">
     <img alt="Wemos Wiring" src="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/wemos-wiring-thumb.jpg?raw=true">
@@ -35,3 +35,7 @@ Now connect your Wemos D1 mini to your co2 monitor:
 
 * PubSubClient
 * Arduino/ESP8266
+
+## notes
+
+Don't use D4 and D3, because it causes power-on issues with wemos d1 mini: https://www.forward.com.au/pfod/ESP8266/GPIOpins/index.html
