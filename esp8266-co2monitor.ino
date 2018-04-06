@@ -24,6 +24,7 @@ uint8_t tmp = 0;
 unsigned long currentMillis = 0;
 unsigned long lastMillis = 0;
 unsigned long lastUpdateMs = 0;
+uint8_t mqttRetryCounter = 0;
 
 uint16_t co2Measurement = 0;
 float smoothCo2Measurement = 0.0;
@@ -48,7 +49,7 @@ void setup() {
 
   attachInterrupt(PIN_CLK, onClock, RISING);
 
-  WiFi.hostname(WIFI_HOSTNAME);
+  WiFi.hostname(HOSTNAME);
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
@@ -60,7 +61,7 @@ void setup() {
   mqttClient.setClient(wifiClient);
   mqttClient.setServer(MQTT_HOST, 1883);
 
-  ArduinoOTA.setHostname(WIFI_HOSTNAME);
+  ArduinoOTA.setHostname(HOSTNAME);
   ArduinoOTA.setPassword(OTA_PASSWORD);
   ArduinoOTA.begin();
 
@@ -91,10 +92,17 @@ void onClock() {
 
 void mqttConnect() {
   while (!mqttClient.connected()) {
-    if (mqttClient.connect(WIFI_HOSTNAME, MQTT_TOPIC_SENSOR_STATE, 1, true, "disconnected")) {
-      mqttClient.publish(MQTT_TOPIC_SENSOR_STATE, "connected", true);
+    if (mqttClient.connect(HOSTNAME, MQTT_TOPIC_LAST_WILL, 1, true, "disconnected")) {
+      mqttClient.publish(MQTT_TOPIC_LAST_WILL, "connected", true);
+      mqttRetryCounter = 0;
+      
     } else {
-      delay(1000);
+            
+      if (mqttRetryCounter++ > MQTT_MAX_CONNECT_RETRY) {
+        ESP.restart();
+      }
+      
+      delay(2000);
     }
   }
 }

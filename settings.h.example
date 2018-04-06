@@ -7,12 +7,13 @@ const unsigned long PUBLISH_INTERVAL_FAST_MS = (10 * 1000);
 const unsigned long PUBLISH_INTERVAL_SLOW_MS = (5 * 60 * 1000);
 
 const char* MQTT_HOST = "mqtt.core.bckspc.de";
+const uint8_t MQTT_MAX_CONNECT_RETRY = 42;
 
 const char* MQTT_TOPIC_CO2_MEASUREMENT = "sensor/co2/hackcenter";
 const char* MQTT_TOPIC_TEMPERATURE_MEASUREMENT = "sensor/temperature/hackcenter/co2sensor";
-const char* MQTT_TOPIC_SENSOR_STATE = "state/sensor/co2/hackcenter";
+const char* MQTT_TOPIC_LAST_WILL = "state/sensor/co2/lounge";
 
-const char* WIFI_HOSTNAME = "ESP-co2Monitor";
+const char* HOSTNAME = "ESP-co2Monitor";
 const char* WIFI_SSID = "tolles wifi";
 const char* WIFI_PASSWORD = "tolles pw";
 
