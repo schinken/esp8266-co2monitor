@@ -68,7 +68,7 @@ void setup() {
   mqttConnect();
 }
 
-void onClock() {
+ICACHE_RAM_ATTR void onClock() {
 
   lastMillis = millis();
   bits[bitIndex++] = (digitalRead(PIN_DATA) == HIGH) ? 1 : 0;
@@ -174,4 +174,3 @@ bool decodeDataPackage(byte data[5]) {
   }
 
 }
-
