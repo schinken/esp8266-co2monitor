@@ -92,7 +92,15 @@ ICACHE_RAM_ATTR void onClock() {
 
 void mqttConnect() {
   while (!mqttClient.connected()) {
-    if (mqttClient.connect(HOSTNAME, MQTT_TOPIC_LAST_WILL, 1, true, "disconnected")) {
+    
+    bool mqttConnected = false;
+    if (MQTT_USERNAME && MQTT_PASSWORD) {
+      mqttConnected = mqttClient.connect(HOSTNAME, MQTT_USERNAME, MQTT_PASSWORD, MQTT_TOPIC_LAST_WILL, 1, true, "disconnected");
+    } else {
+      mqttConnected = mqttClient.connect(HOSTNAME, MQTT_TOPIC_LAST_WILL, 1, true, "disconnected");
+    }
+    
+    if (mqttConnected) {
       mqttClient.publish(MQTT_TOPIC_LAST_WILL, "connected", true);
       mqttRetryCounter = 0;
       

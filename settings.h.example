@@ -7,6 +7,9 @@ const unsigned long PUBLISH_INTERVAL_FAST_MS = (10 * 1000);
 const unsigned long PUBLISH_INTERVAL_SLOW_MS = (5 * 60 * 1000);
 
 const char* MQTT_HOST = "mqtt.core.bckspc.de";
+const char* MQTT_USERNAME = NULL;
+const char* MQTT_PASSWORD = NULL;
+
 const uint8_t MQTT_MAX_CONNECT_RETRY = 42;
 
 const char* MQTT_TOPIC_CO2_MEASUREMENT = "sensor/co2/hackcenter";
