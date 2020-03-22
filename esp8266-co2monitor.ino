@@ -174,8 +174,8 @@ void mqttConnect() {
 \"dev\": {\
 \"identifiers\":\"%s\",\
 \"name\":\"%s\",\
-\"manufacturer\":\"TFA Dostmann\",\
-\"model\":\"AIRCO2NTROL MINI\"\
+\"manufacturer\":\"RADIANT INNOVATION INC\",\
+\"model\":\"ZyAura ZGm05\"\
 }\
 }"
 #define AUTOCONFIG_PAYLOAD_TPL_CO2  "{\
@@ -186,8 +186,8 @@ void mqttConnect() {
 \"dev\": {\
 \"identifiers\":\"%s\",\
 \"name\":\"%s\",\
-\"manufacturer\":\"TFA Dostmann\",\
-\"model\":\"AIRCO2NTROL MINI\"\
+\"manufacturer\":\"RADIANT INNOVATION INC\",\
+\"model\":\"ZyAura ZGm05\"\
 }\
 }"
 
