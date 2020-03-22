@@ -21,9 +21,23 @@ const char* MQTT_PASSWORD = NULL;
 
 const uint8_t MQTT_MAX_CONNECT_RETRY = 42;
 
-const char* MQTT_TOPIC_CO2_MEASUREMENT = "sensor/co2/hackcenter";
-const char* MQTT_TOPIC_TEMPERATURE_MEASUREMENT = "sensor/temperature/hackcenter/co2sensor";
-const char* MQTT_TOPIC_LAST_WILL = "state/sensor/co2/lounge";
+//If you don't want to use home-assistant autodiscovery comment this out
+#define USE_HA_AUTODISCOVERY
+
+
+#ifdef USE_HA_AUTODISCOVERY
+  #define HA_DISCOVERY_PREFIX "homeassistant"
+  const char* MQTT_LAST_WILL_PAYLOAD_CONNECTED = "online";
+  const char* MQTT_LAST_WILL_PAYLOAD_DISCONNECTED = "offline";
+#else
+  //If you're not using HA Autodiscovery, you can specify your topics here
+
+  const char* MQTT_TOPIC_CO2_MEASUREMENT = "sensor/co2/hackcenter";
+  const char* MQTT_TOPIC_TEMPERATURE_MEASUREMENT = "sensor/temperature/hackcenter/co2sensor";
+  const char* MQTT_TOPIC_LAST_WILL = "state/sensor/co2/lounge";
+  const char* MQTT_LAST_WILL_PAYLOAD_CONNECTED = "connected";
+  const char* MQTT_LAST_WILL_PAYLOAD_DISCONNECTED = "disconnected";
+#endif
 
 
 //These are optional

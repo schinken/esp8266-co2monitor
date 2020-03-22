@@ -2,13 +2,15 @@
 
 ## description
 
-Interface an TFA Dostmann CO2 Monitor with ESP8266 (in our example a WEMOS D1 Mini) to connect it to the "Internet of Things". It publishes the CO2 measurement and temperature to a configures MQTT topic.
+Interface an TFA Dostmann CO2 Monitor with ESP8266 (in our example a WEMOS D1 Mini) to connect it to the "Internet of Things". It publishes the CO2 measurement and temperature to a configured MQTT topic.
+
+It also implements [Home Assistant Auto Discovery](https://www.home-assistant.io/docs/mqtt/discovery/).
 
 ## compiling
 
 * Rename settings.h.example to settings.h
 * Open up your arduino IDE
-* Configure your OTA-Settings, MQTT Topics etc. in the settings.h file
+* Edit the settings.h to match your setup
 * Upload the compiled result to your Wemos D1 Mini
 
 ## wiring
@@ -37,11 +39,12 @@ Since we're using [WiFiManager](https://github.com/tzapu/WiFiManager), after fla
 The ESP8266 will also default to AP mode if the configured wifi is unavailable.
 You might want to set a password for the AP mode in your settings.h
 
+If `USE_HA_AUTODISCOVERY` is set and mqtt is configured correctly,
+you should find a new device with CO2 + Temperature entities in your Home Assistant installations devices section.
+
 ## dependencies
 
-* PubSubClient
 * Arduino/ESP8266
-* tzapu/WiFiManager
 
 ## notes
 
