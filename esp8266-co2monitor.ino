@@ -1,6 +1,11 @@
 #include <PubSubClient.h>
 #include <ESP8266WiFi.h>
 #include <ArduinoOTA.h>
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>
+
+
 #include "settings.h"
 
 #define IDX_CMD 0
@@ -36,34 +41,53 @@ byte bytes[5] = {0};
 
 char sprintfHelper[16] = {0};
 
+char hostname[16];
+
 void setup() {
+  Serial.begin(115200);
+  Serial.println("\n");
+  Serial.println("Hello from esp8266-co2monitor");
 
   // Power up wait
   delay(2000);
-  
-  Serial.begin(115200);
-  Serial.println("Hello");
+
+  WiFiManager wifiManager;
+  int32_t chipid = ESP.getChipId();
+
+
+#ifdef HOSTNAME
+  hostname = HOSTNAME;
+#else
+  snprintf(hostname, 24, "CO2MONITOR-%X", chipid);
+#endif
+
+#ifdef CONF_WIFI_PASSWORD
+  wifiManager.autoConnect(hostname, CONF_WIFI_PASSWORD);
+#else
+  wifiManager.autoConnect(hostname);
+#endif
+
+  WiFi.hostname(hostname);
+  mqttClient.setClient(wifiClient);
+  mqttClient.setServer(MQTT_HOST, 1883);
+
+  ArduinoOTA.setHostname(hostname);
+  ArduinoOTA.setPassword(OTA_PASSWORD);
+  ArduinoOTA.begin();
 
   pinMode(PIN_CLK, INPUT);
   pinMode(PIN_DATA, INPUT);
 
   attachInterrupt(PIN_CLK, onClock, RISING);
 
-  WiFi.hostname(HOSTNAME);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Hostname: ");
+  Serial.println(hostname);
 
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(500);
-  }
-
-  mqttClient.setClient(wifiClient);
-  mqttClient.setServer(MQTT_HOST, 1883);
-
-  ArduinoOTA.setHostname(HOSTNAME);
-  ArduinoOTA.setPassword(OTA_PASSWORD);
-  ArduinoOTA.begin();
+  Serial.println("-- Current GPIO Configuration --");
+  Serial.print("PIN_CLK: ");
+  Serial.println(PIN_CLK);
+  Serial.print("PIN_DATA: ");
+  Serial.println(PIN_DATA);
 
   mqttConnect();
 }
@@ -92,24 +116,27 @@ ICACHE_RAM_ATTR void onClock() {
 
 void mqttConnect() {
   while (!mqttClient.connected()) {
-    
+
     bool mqttConnected = false;
     if (MQTT_USERNAME && MQTT_PASSWORD) {
-      mqttConnected = mqttClient.connect(HOSTNAME, MQTT_USERNAME, MQTT_PASSWORD, MQTT_TOPIC_LAST_WILL, 1, true, "disconnected");
+      mqttConnected = mqttClient.connect(hostname, MQTT_USERNAME, MQTT_PASSWORD, MQTT_TOPIC_LAST_WILL, 1, true, "disconnected");
     } else {
-      mqttConnected = mqttClient.connect(HOSTNAME, MQTT_TOPIC_LAST_WILL, 1, true, "disconnected");
+      mqttConnected = mqttClient.connect(hostname, MQTT_TOPIC_LAST_WILL, 1, true, "disconnected");
     }
-    
+
     if (mqttConnected) {
+      Serial.println("Connected to MQTT Broker");
       mqttClient.publish(MQTT_TOPIC_LAST_WILL, "connected", true);
       mqttRetryCounter = 0;
-      
+
     } else {
-            
+      Serial.println("Failed to connect to MQTT Broker");
+
       if (mqttRetryCounter++ > MQTT_MAX_CONNECT_RETRY) {
+        Serial.println("Restarting uC");
         ESP.restart();
       }
-      
+
       delay(2000);
     }
   }
@@ -127,7 +154,7 @@ void loop() {
   long updateInterval = PUBLISH_INTERVAL_SLOW_MS;
 
   // If the change is above a specific threshold, we update faster!
-  float percentChange = abs(((float) co2Measurement / smoothCo2Measurement) - 1.0);   
+  float percentChange = abs(((float) co2Measurement / smoothCo2Measurement) - 1.0);
   if (percentChange > 0.05) {
     updateInterval = PUBLISH_INTERVAL_FAST_MS;
   }

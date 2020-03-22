@@ -1,5 +1,14 @@
-#define PIN_CLK D2
+#define PIN_CLK  D2
 #define PIN_DATA D1
+
+
+/**
+ * If you're using a cheap D1 clone, these might be the correct pins for you
+ * 
+ */
+#define PIN_CLK  4 //D2 on PCB
+#define PIN_DATA 5 //D1 on PCB
+*/
 
 const float EXP_SMOOTH_ALPHA = 0.125;
 
@@ -16,8 +25,9 @@ const char* MQTT_TOPIC_CO2_MEASUREMENT = "sensor/co2/hackcenter";
 const char* MQTT_TOPIC_TEMPERATURE_MEASUREMENT = "sensor/temperature/hackcenter/co2sensor";
 const char* MQTT_TOPIC_LAST_WILL = "state/sensor/co2/lounge";
 
-const char* HOSTNAME = "ESP-co2Monitor";
-const char* WIFI_SSID = "tolles wifi";
-const char* WIFI_PASSWORD = "tolles pw";
+
+//These are optional
+//const char* HOSTNAME = "ESP-co2Monitor";
+//const char* CONF_WIFI_PASSWORD = "drowssap";
 
 #define OTA_PASSWORD "foobarbaz"
