@@ -8,7 +8,7 @@ Interface an TFA Dostmann CO2 Monitor with ESP8266 (in our example a WEMOS D1 Mi
 
 * Rename settings.h.example to settings.h
 * Open up your arduino IDE
-* Configure your OTA, Wifi, MQTT Topics in the settings.h file
+* Configure your OTA-Settings, MQTT Topics etc. in the settings.h file
 * Upload the compiled result to your Wemos D1 Mini
 
 ## wiring
@@ -31,10 +31,17 @@ Now connect your Wemos D1 mini to your co2 monitor:
     <img alt="Final Wiring" src="https://github.com/b4ckspace/esp8266-co2monitor/blob/master/doc/images/wiring-thumb.jpg?raw=true">
 </a>
 
+## using
+Since we're using [WiFiManager](https://github.com/tzapu/WiFiManager), after flashing, the EPS8266 will open up a WiFi Hotspot to configure Wireless credentials. Just connect to it using a wifi-capable device and you should be automatically redirected to the configuration page.
+
+The ESP8266 will also default to AP mode if the configured wifi is unavailable.
+You might want to set a password for the AP mode in your settings.h
+
 ## dependencies
 
 * PubSubClient
 * Arduino/ESP8266
+* tzapu/WiFiManager
 
 ## notes
 
