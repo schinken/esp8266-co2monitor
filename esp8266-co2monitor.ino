@@ -1,9 +1,10 @@
-#include <PubSubClient.h>
 #include <ESP8266WiFi.h>
 #include <ArduinoOTA.h>
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
-#include <WiFiManager.h>
+
+#include "dep/pubsubclient-2.7/src/PubSubClient.cpp"
+#include "dep/WiFiManager-0.15.0/WiFiManager.cpp"
 
 
 #include "settings.h"
@@ -16,6 +17,13 @@
 
 #define CMD_TEMPERATURE 0x42
 #define CMD_CO2_MEASUREMENT 0x50
+
+#ifdef USE_HA_AUTODISCOVERY
+  #define FIRMWARE_PREFIX "esp8266-co2monitor"
+  char MQTT_TOPIC_LAST_WILL[128];
+  char MQTT_TOPIC_CO2_MEASUREMENT[128];
+  char MQTT_TOPIC_TEMPERATURE_MEASUREMENT[128];
+#endif
 
 WiFiClient wifiClient;
 PubSubClient mqttClient;
@@ -54,11 +62,20 @@ void setup() {
   WiFiManager wifiManager;
   int32_t chipid = ESP.getChipId();
 
+  Serial.print("MQTT_MAX_PACKET_SIZE: ");
+  Serial.println(MQTT_MAX_PACKET_SIZE);
+
 
 #ifdef HOSTNAME
   hostname = HOSTNAME;
 #else
   snprintf(hostname, 24, "CO2MONITOR-%X", chipid);
+#endif
+
+#ifdef USE_HA_AUTODISCOVERY
+  snprintf(MQTT_TOPIC_LAST_WILL, 127, "%s/%s/presence", FIRMWARE_PREFIX, hostname);
+  snprintf(MQTT_TOPIC_CO2_MEASUREMENT, 127, "%s/%s/%s_%s/state", FIRMWARE_PREFIX, hostname, hostname, "co2");
+  snprintf(MQTT_TOPIC_TEMPERATURE_MEASUREMENT, 127, "%s/%s/%s_%s/state", FIRMWARE_PREFIX, hostname, hostname, "temp");
 #endif
 
 #ifdef CONF_WIFI_PASSWORD
@@ -119,15 +136,19 @@ void mqttConnect() {
 
     bool mqttConnected = false;
     if (MQTT_USERNAME && MQTT_PASSWORD) {
-      mqttConnected = mqttClient.connect(hostname, MQTT_USERNAME, MQTT_PASSWORD, MQTT_TOPIC_LAST_WILL, 1, true, "disconnected");
+      mqttConnected = mqttClient.connect(hostname, MQTT_USERNAME, MQTT_PASSWORD, MQTT_TOPIC_LAST_WILL, 1, true, MQTT_LAST_WILL_PAYLOAD_DISCONNECTED);
     } else {
-      mqttConnected = mqttClient.connect(hostname, MQTT_TOPIC_LAST_WILL, 1, true, "disconnected");
+      mqttConnected = mqttClient.connect(hostname, MQTT_TOPIC_LAST_WILL, 1, true, MQTT_LAST_WILL_PAYLOAD_DISCONNECTED);
     }
 
     if (mqttConnected) {
       Serial.println("Connected to MQTT Broker");
-      mqttClient.publish(MQTT_TOPIC_LAST_WILL, "connected", true);
+      mqttClient.publish(MQTT_TOPIC_LAST_WILL, MQTT_LAST_WILL_PAYLOAD_CONNECTED, true);
       mqttRetryCounter = 0;
+
+      #ifdef USE_HA_AUTODISCOVERY
+        setupHAAutodiscovery();
+      #endif
 
     } else {
       Serial.println("Failed to connect to MQTT Broker");
@@ -141,6 +162,101 @@ void mqttConnect() {
     }
   }
 }
+
+
+#ifdef USE_HA_AUTODISCOVERY
+#define AUTOCONFIG_PAYLOAD_TPL_TEMP  "{\
+\"stat_t\":\"%s/%s/%s_temp/state\",\
+\"unique_id\":\"%s_temp\",\
+\"name\":\"%s Temp\",\
+\"unit_of_meas\":\"°C\",\
+\"dev_cla\":\"temperature\",\
+\"dev\": {\
+\"identifiers\":\"%s\",\
+\"name\":\"%s\",\
+\"manufacturer\":\"RADIANT INNOVATION INC\",\
+\"model\":\"ZyAura ZGm05\"\
+}\
+}"
+#define AUTOCONFIG_PAYLOAD_TPL_CO2  "{\
+\"stat_t\":\"%s/%s/%s_co2/state\",\
+\"unique_id\":\"%s_co2\",\
+\"name\":\"%s CO2\",\
+\"unit_of_meas\":\"ppm\",\
+\"dev\": {\
+\"identifiers\":\"%s\",\
+\"name\":\"%s\",\
+\"manufacturer\":\"RADIANT INNOVATION INC\",\
+\"model\":\"ZyAura ZGm05\"\
+}\
+}"
+
+void setupHAAutodiscovery() {
+  char autoconfig_topic_co2[128];
+  char autoconfig_payload_co2[1024];
+  char autoconfig_topic_temp[128];
+  char autoconfig_payload_temp[1024];
+
+  snprintf(
+    autoconfig_topic_co2,
+    127,
+    "%s/sensor/%s/%s_co2/config",
+    HA_DISCOVERY_PREFIX,
+    hostname,
+    hostname
+  );
+
+  snprintf(
+    autoconfig_topic_temp,
+    127,
+    "%s/sensor/%s/%s_temp/config",
+    HA_DISCOVERY_PREFIX,
+    hostname,
+    hostname
+  );
+
+  snprintf(
+    autoconfig_payload_co2,
+    1023,
+
+    AUTOCONFIG_PAYLOAD_TPL_CO2,
+
+    FIRMWARE_PREFIX,
+    hostname,
+    hostname,
+    hostname,
+    hostname,
+    hostname,
+    hostname
+  );
+
+  snprintf(
+    autoconfig_payload_temp,
+    1023,
+
+    AUTOCONFIG_PAYLOAD_TPL_TEMP,
+
+    FIRMWARE_PREFIX,
+    hostname,
+    hostname,
+    hostname,
+    hostname,
+    hostname,
+    hostname
+  );
+
+  Serial.println(autoconfig_topic_co2);
+  Serial.println(autoconfig_payload_co2);
+  if(
+    mqttClient.publish(autoconfig_topic_co2, autoconfig_payload_co2, true) &&
+    mqttClient.publish(autoconfig_topic_temp, autoconfig_payload_temp, true)
+  ){
+    Serial.println("Autoconf publish successful");
+  } else {
+    Serial.println("Autoconf publish failed. Is MQTT_MAX_PACKET_SIZE large enough?");
+  }
+}
+#endif
 
 void loop() {
   currentMillis = millis();
@@ -207,5 +323,4 @@ bool decodeDataPackage(byte data[5]) {
       Serial.println(temperature);
       break;
   }
-
 }
