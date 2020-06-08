@@ -294,7 +294,6 @@ void loop() {
   mqttClient.loop();
 
   ArduinoOTA.handle();
-  delay(40);
 }
 
 bool decodeDataPackage(byte data[5]) {
