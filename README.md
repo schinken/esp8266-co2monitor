@@ -6,6 +6,21 @@ Interface an TFA Dostmann CO2 Monitor with ESP8266 (in our example a WEMOS D1 Mi
 
 It also implements [Home Assistant Auto Discovery](https://www.home-assistant.io/docs/mqtt/discovery/).
 
+## esphome
+
+This can also be done by esphome now :) 
+
+```yaml
+sensor:
+  - platform: zyaura
+    clock_pin: 4
+    data_pin: 5
+    co2:
+      name: "Hobby CO2"
+    temperature:
+      name: "Hobby Temperature"
+```
+
 ## compiling
 
 * Rename settings.h.example to settings.h
